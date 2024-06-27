@@ -1,2 +1,3 @@
-# aws-jenkins-deployment
-Jenkins Deployment on AWS
+# AWS Jenkins Deployment
+
+`$ terraform login`

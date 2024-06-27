@@ -1,0 +1,51 @@
+version: '3'
+
+tasks:
+  build:
+    desc: "Build Jenkins image"
+    dir: modules/jenkins/docker
+    cmds:
+      - docker build --builder {{.BUILDER}} -t {{.REPOSITORY}}/jenkins:{{.VERSION}} .
+      - docker tag {{.REPOSITORY}}/jenkins:{{.VERSION}} {{.REPOSITORY}}/jenkins:latest
+      - docker push {{.REPOSITORY}}/jenkins:{{.VERSION}}
+      - docker push {{.REPOSITORY}}/jenkins:latest
+    silent: true
+    vars:
+      BUILDER: cloud-dksifoua-builder
+      REPOSITORY:
+        sh: grep 'LABEL repository=' Dockerfile | cut -d '"' -f 2
+      VERSION:
+        sh: grep 'LABEL version=' Dockerfile | cut -d '"' -f 2
+
+  tf-init:
+    desc: "Initialize Terraform working directory"
+    cmd: terraform init -upgrade
+    silent: true
+
+  tf-validate:
+    desc: "Validate the Terraform configuration"
+    cmd: terraform validate
+    silent: true
+
+  tf-fmt:
+    desc: "Format Terraform configuration files"
+    cmd: terraform fmt -recursive
+    silent: true
+
+  tf-plan:
+    desc: "Create execution plan from the Terraform configuration"
+    cmd: terraform plan -out=plan.out
+    silent: true
+
+  tf-apply:
+    desc: "Apply Terraform configuration"
+    cmds:
+      - defer: rm plan.out
+      - task: tf-plan
+      - terraform apply plan.out
+    silent: true
+
+  tf-destroy:
+    desc: "Destroy Terraform configuration"
+    cmd: terraform destroy -auto-approve
+    silent: true
