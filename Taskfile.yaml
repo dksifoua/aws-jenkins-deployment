@@ -1,21 +1,62 @@
 version: '3'
 
+dotenv:
+  - ".env"
+
+vars:
+  BUILDER:
+    sh: |
+      if [ $ENV == "local" ]; then
+        echo "desktop-linux"
+      else
+        echo "cloud-dksifoua-builder"
+      fi
+  DOCKER_FILE: modules/jenkins/docker/Dockerfile
+  JCASC_FILE: modules/jenkins/jcasc/jenkins.yaml
+  REPOSITORY:
+    sh: grep 'LABEL repository=' {{.DOCKER_FILE}} | cut -d '"' -f 2
+  VERSION:
+    sh: grep 'LABEL version=' {{.DOCKER_FILE}} | cut -d '"' -f 2
+
 tasks:
   build:
     desc: "Build Jenkins image"
-    dir: modules/jenkins/docker
+    cmd: |
+      docker build \
+        --build-arg JCASC_FILE="{{.JCASC_FILE}}" \
+        --build-arg JENKINS_ADMIN_USER="$JENKINS_ADMIN_USER" \
+        --build-arg JENKINS_ADMIN_NAME="$JENKINS_ADMIN_NAME" \
+        --build-arg JENKINS_ADMIN_DESC="$JENKINS_ADMIN_DESC" \
+        --build-arg JENKINS_ADMIN_PASS="$JENKINS_ADMIN_PASS" \
+        --builder {{.BUILDER}} \
+        --file {{.DOCKER_FILE}} \
+        --no-cache \
+        --tag {{.REPOSITORY}}/jenkins:{{.VERSION}} \
+        .
+    silent: true
+
+  run:
+    desc: "Run local Jenkins container"
+    cmd: |
+      docker run \
+        --detach \
+        --name jenkins \
+        --publish 8080:8080 \
+        --rm \
+        {{.REPOSITORY}}/jenkins:{{.VERSION}}
+    silent: true
+
+  tag:
+    desc: "Tag Jenkins image"
+    cmd: docker tag {{.REPOSITORY}}/jenkins:{{.VERSION}} {{.REPOSITORY}}/jenkins:latest
+    silent: true
+
+  push:
+    desc: "Push Jenkins image to DockerHub"
     cmds:
-      - docker build --builder {{.BUILDER}} -t {{.REPOSITORY}}/jenkins:{{.VERSION}} .
-      - docker tag {{.REPOSITORY}}/jenkins:{{.VERSION}} {{.REPOSITORY}}/jenkins:latest
       - docker push {{.REPOSITORY}}/jenkins:{{.VERSION}}
       - docker push {{.REPOSITORY}}/jenkins:latest
     silent: true
-    vars:
-      BUILDER: cloud-dksifoua-builder
-      REPOSITORY:
-        sh: grep 'LABEL repository=' Dockerfile | cut -d '"' -f 2
-      VERSION:
-        sh: grep 'LABEL version=' Dockerfile | cut -d '"' -f 2
 
   tf-init:
     desc: "Initialize Terraform working directory"
