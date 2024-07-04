@@ -1,21 +1,48 @@
 jenkins:
   systemMessage: |
-    Welcome to our build server.
-    
-    This Jenkins is 100% configured and managed 'as code'.
-    Config is now mostly handled by the 'Jenkins Configuration as Code' (JCasC) plugin.
-    JCasC config can be found in the jenkins.yaml file in the $JENKINS_HOME folder.
+    <h1  style="background-color: #35824E; color: white; text-align: center;">
+    Jenkins Automation Server  for Continuous Integration & Continuous Deployment
+    </h1>
+    <p style="text-align: center;">
+    This Jenkins is 100% configured and managed <b>as code</b>.<br />
+    Configuration is now mostly handled by the <b>Jenkins Configuration as Code (JCasC)</b> plugin.<br />
+    JCasC config can be found in the <code>jenkins.yaml</code> file in the <code>/var/jenkins_home</code> folder.
+    </p>
+  markupFormatter:
+    rawHtml:
+      disableSyntaxHighlighting: true
   numExecutors: 0
-  scmCheckoutRetryCount: 2
 
   securityRealm:
     local:
       allowsSignup: false
+      enableCaptcha: false
       users:
         - id: ${JENKINS_ADMIN_USER}
           name: ${JENKINS_ADMIN_NAME}
           description: ${JENKINS_ADMIN_DESC}
           password: ${JENKINS_ADMIN_PASS}
           properties:
-            - mailer:
-                emailAddress: ${JENKINS_ADMIN_EMAIL}
+            - timezone:
+                timeZoneName: America/Toronto
+
+  authorizationStrategy:
+    globalMatrix:
+      entries:
+        - user:
+            name: ${JENKINS_ADMIN_USER}
+            permissions:
+              - Overall/Administer
+        - group:
+            name: authenticated
+            permissions:
+              - Overall/Read
+        - user:
+            name: anonymous
+            permissions:
+              - Overall/Read
+
+appearance:
+  locale:
+    systemLocale: en
+    ignoreAcceptLanguage: true

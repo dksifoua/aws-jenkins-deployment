@@ -13,6 +13,7 @@ vars:
       fi
   DOCKER_FILE: modules/jenkins/docker/Dockerfile
   JCASC_FILE: modules/jenkins/jcasc/jenkins.yaml
+  PLUGINS_FILE: modules/jenkins/jcasc/plugins.txt
   REPOSITORY:
     sh: grep 'LABEL repository=' {{.DOCKER_FILE}} | cut -d '"' -f 2
   VERSION:
@@ -24,6 +25,7 @@ tasks:
     cmd: |
       docker build \
         --build-arg JCASC_FILE="{{.JCASC_FILE}}" \
+        --build-arg PLUGINS_FILE="{{.PLUGINS_FILE}}" \
         --build-arg JENKINS_ADMIN_USER="$JENKINS_ADMIN_USER" \
         --build-arg JENKINS_ADMIN_NAME="$JENKINS_ADMIN_NAME" \
         --build-arg JENKINS_ADMIN_DESC="$JENKINS_ADMIN_DESC" \
@@ -42,7 +44,6 @@ tasks:
         --detach \
         --name jenkins \
         --publish 8080:8080 \
-        --rm \
         {{.REPOSITORY}}/jenkins:{{.VERSION}}
     silent: true
 
