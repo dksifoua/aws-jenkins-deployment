@@ -30,6 +30,7 @@ tasks:
         --build-arg JENKINS_ADMIN_NAME="$JENKINS_ADMIN_NAME" \
         --build-arg JENKINS_ADMIN_DESC="$JENKINS_ADMIN_DESC" \
         --build-arg JENKINS_ADMIN_PASS="$JENKINS_ADMIN_PASS" \
+        --build-arg GITHUB_ACCESS_TOKEN="$GITHUB_ACCESS_TOKEN" \
         --builder {{.BUILDER}} \
         --file {{.DOCKER_FILE}} \
         --no-cache \

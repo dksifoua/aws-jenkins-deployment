@@ -42,6 +42,16 @@ jenkins:
             permissions:
               - Overall/Read
 
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - string:
+              description: GitHub Personal Access Token
+              id: github-dksifoua
+              scope: GLOBAL
+              secret: ${GITHUB_ACCESS_TOKEN}
+
 appearance:
   locale:
     systemLocale: en
