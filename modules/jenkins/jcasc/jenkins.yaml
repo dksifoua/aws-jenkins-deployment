@@ -37,10 +37,15 @@ jenkins:
             name: authenticated
             permissions:
               - Overall/Read
+              - Job/Read
+              - View/Read
+              - Run/Replay
         - user:
             name: anonymous
             permissions:
               - Overall/Read
+              - Job/Read
+              - View/Read
 
 credentials:
   system:
@@ -48,9 +53,15 @@ credentials:
       - credentials:
           - string:
               description: GitHub Personal Access Token
-              id: github
+              id: github-token
               scope: GLOBAL
               secret: ${GITHUB_ACCESS_TOKEN}
+          - usernamePassword:
+              description: GitHub Username & Password
+              id: github-pass
+              scope: GLOBAL
+              username: ${GITHUB_USER}
+              password: ${GITHUB_ACCESS_TOKEN}
 
 appearance:
   locale:
@@ -62,7 +73,7 @@ unclassified:
     configs:
       - name: Default
         apiUrl: https://api.github.com
-        credentialsId: github
+        credentialsId: github-token
         manageHooks: true
 
   githubconfiguration:
@@ -70,15 +81,15 @@ unclassified:
 
 jobs:
   - script: >
-      organizationFolder('GitHub Org - dksifoua') {
-        description('This contains all repositories with a Jenkinsfile from my github account')
-        displayName('GitHub Organization Folder - dksifoua')
+      organizationFolder("GitHub Org - ${GITHUB_USER}") {
+        description("This contains all repositories with a Jenkinsfile from my github account")
+        displayName("GitHub Organization Folder - ${GITHUB_USER}")
       
         organizations {
           github {
-            repoOwner('dksifoua')
-            apiUri('https://api.github.com')
-            credentialsId('github')
+            repoOwner("${GITHUB_USER}")
+            apiUri("https://api.github.com")
+            credentialsId("github-pass")
             enableAvatar(true)
             
             traits {
@@ -98,7 +109,7 @@ jobs:
                 strategyId(2) // The Current Pull Request Revision
               }
               multiBranchProjectDisplayNaming {
-                displayNamingStrategy('RAW_AND_OBJECT_DISPLAY_NAME')
+                displayNamingStrategy("RAW_AND_OBJECT_DISPLAY_NAME")
               }
               /*userIdentity {
                 extension {
@@ -121,11 +132,11 @@ jobs:
         
         projectFactories {
           workflowMultiBranchProjectFactory {
-            scriptPath('Jenkinsfile')
+            scriptPath("Jenkinsfile")
           }
         }
       
         triggers {
-          cron('@daily')
+          cron("@daily")
         }
       }
