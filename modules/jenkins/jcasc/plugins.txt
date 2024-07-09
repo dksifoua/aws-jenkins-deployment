@@ -1,6 +1,7 @@
 blueocean:latest
 configuration-as-code:latest
 github-branch-source:latest
+job-dsl:latest
 locale:latest
 matrix-auth:latest
 token-macro:latest

@@ -3,7 +3,7 @@ LABEL authors="Dimitri Sifoua"
 LABEL description="Jenkins CI/CD Server"
 LABEL maintainer="Dimitri Sifoua <dimitri.sifoua@gmail.com>"
 LABEL repository="dksifoua"
-LABEL version="1.1.3"
+LABEL version="1.1.6"
 
 ARG JCASC_FILE
 ARG PLUGINS_FILE

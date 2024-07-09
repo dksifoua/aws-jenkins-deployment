@@ -33,10 +33,10 @@ tasks:
         --build-arg GITHUB_ACCESS_TOKEN="$GITHUB_ACCESS_TOKEN" \
         --builder {{.BUILDER}} \
         --file {{.DOCKER_FILE}} \
-        --no-cache \
         --tag {{.REPOSITORY}}/jenkins:{{.VERSION}} \
         .
     silent: true
+    # --no-cache \
 
   run:
     desc: "Run local Jenkins container"
