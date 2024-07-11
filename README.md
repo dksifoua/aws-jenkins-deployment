@@ -3,7 +3,7 @@
 `$ terraform login`
 
 TODOs
-- [] Divide JCasC file into multiple files
+- [x] Divide JCasC file into multiple files
 - [] Use Variables instead of hardcoded values
 - [] Deactivate daily scanning of GitHub organization
 - [] Jenkins System Message

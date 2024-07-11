@@ -5,7 +5,7 @@ LABEL maintainer="Dimitri Sifoua <dimitri.sifoua@gmail.com>"
 LABEL repository="dksifoua"
 LABEL version="1.1.6"
 
-ARG JCASC_FILE
+ARG JCASC_FILES
 ARG PLUGINS_FILE
 ARG JENKINS_ADMIN_USER
 ARG JENKINS_ADMIN_NAME
@@ -23,6 +23,8 @@ ENV JENKINS_ADMIN_EMAIL $JENKINS_ADMIN_EMAIL
 ENV GITHUB_USER $GITHUB_USER
 ENV GITHUB_ACCESS_TOKEN $GITHUB_ACCESS_TOKEN
 
+ENV CASC_JENKINS_CONFIG=$JENKINS_HOME/casc_configs
+
 #USER root
 #RUN apt-get update && apt-get install -y lsb-release
 #RUN curl -fsSLo /usr/share/keyrings/docker-archive-keyring.asc \
@@ -34,7 +36,7 @@ ENV GITHUB_ACCESS_TOKEN $GITHUB_ACCESS_TOKEN
 #RUN apt-get update && apt-get install -y docker-ce-cli
 
 USER jenkins
-COPY ${JCASC_FILE} $JENKINS_HOME/jenkins.yaml
+COPY ${JCASC_FILES} $CASC_JENKINS_CONFIG/
 COPY ${PLUGINS_FILE} $REF/plugins.txt
 RUN echo 2.0 > $REF/jenkins.install.UpgradeWizard.state
 RUN jenkins-plugin-cli -f $REF/plugins.txt

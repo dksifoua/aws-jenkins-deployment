@@ -1,0 +1,10 @@
+unclassified:
+  githubpluginconfig:
+    configs:
+      - name: Default
+        apiUrl: https://api.github.com
+        credentialsId: github-token
+        manageHooks: true
+
+  githubconfiguration:
+    apiRateLimitChecker: NoThrottle

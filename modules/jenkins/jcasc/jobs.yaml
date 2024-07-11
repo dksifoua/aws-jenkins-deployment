@@ -1,0 +1,61 @@
+jobs:
+  - script: >
+      organizationFolder("GitHub Org - ${GITHUB_USER}") {
+        description("This contains all repositories with a Jenkinsfile from my github account")
+        displayName("GitHub Organization Folder - ${GITHUB_USER}")
+      
+        organizations {
+          github {
+            repoOwner("${GITHUB_USER}")
+            apiUri("https://api.github.com")
+            credentialsId("github-pass")
+            enableAvatar(true)
+      
+            traits {
+              gitBranchDiscovery()
+              gitHubExcludeArchivedRepositories()
+              gitHubExcludeForkedRepositories()
+              gitHubIgnoreDraftPullRequestFilter()
+              gitHubTagDiscovery()
+              pruneStaleBranch()
+              pruneStaleTag()
+              wipeWorkspaceTrait()
+      
+              gitHubBranchDiscovery {
+                strategyId(3) // All branches
+              }
+              gitHubPullRequestDiscovery {
+                strategyId(2) // The Current Pull Request Revision
+              }
+              multiBranchProjectDisplayNaming {
+                displayNamingStrategy("RAW_AND_OBJECT_DISPLAY_NAME")
+              }
+              /*userIdentity {
+                extension {
+                // If given, "GIT_COMMITTER_NAME=[this]" and "GIT_AUTHOR_NAME=[this]" are set for builds.
+                name(String value)
+                // If given, "GIT_COMMITTER_EMAIL=[this]" and "GIT_AUTHOR_EMAIL=[this]" are set for builds.
+                email(String value)
+                }
+              }*/
+            }
+          }
+        }
+      
+        orphanedItemStrategy {
+          discardOldItems {
+            daysToKeep(7)
+            numToKeep(20)
+          }
+        }
+      
+        projectFactories {
+          workflowMultiBranchProjectFactory {
+            scriptPath("Jenkinsfile")
+          }
+        }
+      
+        triggers {
+          cron("@daily")
+        }
+      }

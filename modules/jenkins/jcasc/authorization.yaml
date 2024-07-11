@@ -1,0 +1,21 @@
+jenkins:
+  authorizationStrategy:
+    globalMatrix:
+      entries:
+        - user:
+            name: ${JENKINS_ADMIN_USER}
+            permissions:
+              - Overall/Administer
+        - group:
+            name: authenticated
+            permissions:
+              - Overall/Read
+              - Job/Read
+              - View/Read
+              - Run/Replay
+        - user:
+            name: anonymous
+            permissions:
+              - Overall/Read
+              - Job/Read
+              - View/Read

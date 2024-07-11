@@ -12,7 +12,7 @@ vars:
         echo "cloud-dksifoua-builder"
       fi
   DOCKER_FILE: modules/jenkins/docker/Dockerfile
-  JCASC_FILE: modules/jenkins/jcasc/jenkins.yaml
+  JCASC_FILES: modules/jenkins/jcasc/*.yaml
   PLUGINS_FILE: modules/jenkins/jcasc/plugins.txt
   REPOSITORY:
     sh: grep 'LABEL repository=' {{.DOCKER_FILE}} | cut -d '"' -f 2
@@ -24,7 +24,7 @@ tasks:
     desc: "Build Jenkins image"
     cmd: |
       docker build \
-        --build-arg JCASC_FILE="{{.JCASC_FILE}}" \
+        --build-arg JCASC_FILES="{{.JCASC_FILES}}" \
         --build-arg PLUGINS_FILE="{{.PLUGINS_FILE}}" \
         --build-arg JENKINS_ADMIN_USER="$JENKINS_ADMIN_USER" \
         --build-arg JENKINS_ADMIN_NAME="$JENKINS_ADMIN_NAME" \
