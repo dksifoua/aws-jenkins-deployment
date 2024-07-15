@@ -6,4 +6,4 @@ jenkins:
   markupFormatter:
     rawHtml:
       disableSyntaxHighlighting: true
-  numExecutors: 2
+  numExecutors: 0

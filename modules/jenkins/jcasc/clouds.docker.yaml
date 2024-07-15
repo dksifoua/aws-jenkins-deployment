@@ -1,0 +1,32 @@
+jenkins:
+  clouds:
+    - docker:
+        containerCap: 5
+        disabled:
+          enabledByChoice: true
+        dockerApi:
+          dockerHost:
+            uri: unix:///var/run/docker.sock
+        errorDuration: 0
+        exposeDockerHost: true
+        name: docker-cloud
+        templates:
+          - connector:
+              attach:
+                user: jenkins
+            disabled:
+              enabledByChoice: true
+            dockerTemplateBase:
+              image: jenkins/inbound-agent:latest
+              mounts:
+                - type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock
+              environmentsString: |
+                ENV=local
+            instanceCapStr: 5
+            labelString: agent
+            name: docker-agent
+            pullStrategy: PULL_LATEST
+            remoteFs: /home/jenkins/agent
+            retentionStrategy:
+              idleMinutes: 1
+            stopTimeout: 10

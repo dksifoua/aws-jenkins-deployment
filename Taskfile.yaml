@@ -12,6 +12,13 @@ vars:
         echo "cloud-dksifoua-builder"
       fi
   DOCKER_FILE: modules/jenkins/docker/Dockerfile
+  DOCKER_HOST_URI:
+    sh: |
+      if [ $ENV == "local" ]; then
+        echo $(docker info 2> /dev/null | grep 'com.docker.desktop.address=' | cut -d '=' -f 2)
+      else
+        echo ""
+      fi
   JCASC_FILES: modules/jenkins/jcasc/*.yaml
   PLUGINS_FILE: modules/jenkins/jcasc/plugins.txt
   REPOSITORY:
@@ -40,6 +47,9 @@ tasks:
     silent: true
     # --no-cache \
 
+  get:
+    cmd: echo {{.DOCKER_HOST_URI}}
+
   run:
     desc: "Run local Jenkins container"
     cmd: |
@@ -47,6 +57,8 @@ tasks:
         --detach \
         --name jenkins \
         --publish 8080:8080 \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        --user root \
         {{.REPOSITORY}}/jenkins:{{.VERSION}}
     silent: true
 

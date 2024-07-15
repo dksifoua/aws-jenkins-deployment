@@ -1,5 +1,7 @@
+# amazon-ecs:latest
 blueocean:latest
 configuration-as-code:latest
+docker-plugin:latest
 github-branch-source:latest
 job-dsl:latest
 locale:latest
