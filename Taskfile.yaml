@@ -4,23 +4,17 @@ dotenv:
   - ".env"
 
 vars:
-  BUILDER:
-    sh: |
-      if [ $ENV == "local" ]; then
-        echo "desktop-linux"
-      else
-        echo "cloud-dksifoua-builder"
-      fi
+  BUILDER: desktop-linux
+#  BUILDER:
+#    sh: |
+#      if [ $ENV == "local" ]; then
+#        echo "desktop-linux"
+#      else
+#        echo "cloud-dksifoua-builder"
+#      fi
   DOCKER_FILE: modules/jenkins/docker/Dockerfile
-  DOCKER_HOST_URI:
-    sh: |
-      if [ $ENV == "local" ]; then
-        echo $(docker info 2> /dev/null | grep 'com.docker.desktop.address=' | cut -d '=' -f 2)
-      else
-        echo ""
-      fi
-  JCASC_FILES: modules/jenkins/jcasc/*.yaml
-  PLUGINS_FILE: modules/jenkins/jcasc/plugins.txt
+  JCASC_CONFIG_PATH: modules/jenkins/jcasc/
+  PLUGINS_FILE: modules/jenkins/plugins/plugins.txt
   REPOSITORY:
     sh: grep 'LABEL repository=' {{.DOCKER_FILE}} | cut -d '"' -f 2
   VERSION:
@@ -31,24 +25,26 @@ tasks:
     desc: "Build Jenkins image"
     cmd: |
       docker build \
-        --build-arg JCASC_FILES="{{.JCASC_FILES}}" \
-        --build-arg PLUGINS_FILE="{{.PLUGINS_FILE}}" \
-        --build-arg JENKINS_ADMIN_USER="$JENKINS_ADMIN_USER" \
-        --build-arg JENKINS_ADMIN_NAME="$JENKINS_ADMIN_NAME" \
+        --build-arg ENV="$ENV" \
+        --build-arg JCASC_CONFIG_PATH="{{.JCASC_CONFIG_PATH}}" \
         --build-arg JENKINS_ADMIN_DESC="$JENKINS_ADMIN_DESC" \
-        --build-arg JENKINS_ADMIN_PASS="$JENKINS_ADMIN_PASS" \
         --build-arg JENKINS_ADMIN_EMAIL="$JENKINS_ADMIN_EMAIL" \
-        --build-arg GITHUB_USER="$GITHUB_USER" \
+        --build-arg JENKINS_ADMIN_NAME="$JENKINS_ADMIN_NAME" \
+        --build-arg JENKINS_ADMIN_PASS="$JENKINS_ADMIN_PASS" \
+        --build-arg JENKINS_ADMIN_USER="$JENKINS_ADMIN_USER" \
         --build-arg GITHUB_ACCESS_TOKEN="$GITHUB_ACCESS_TOKEN" \
+        --build-arg GITHUB_USER="$GITHUB_USER" \
+        --build-arg PLUGINS_FILE="{{.PLUGINS_FILE}}" \
         --builder {{.BUILDER}} \
         --file {{.DOCKER_FILE}} \
         --tag {{.REPOSITORY}}/jenkins:{{.VERSION}} \
+        --no-cache \
         .
     silent: true
-    # --no-cache \
 
   get:
-    cmd: echo {{.DOCKER_HOST_URI}}
+    cmd: echo $ENV
+    silent: true
 
   run:
     desc: "Run local Jenkins container"

@@ -1,0 +1,28 @@
+jenkins:
+  agentsProtocols:
+    - JNLP4-connect
+    - Ping
+  slaveAgentPort: \$${JENKINS_SLAVE_AGENT_PORT}
+  clouds:
+    - ecs:
+        name: jenkins-ecs-fargate-spot-agent
+        cluster: ${cluster_agent_fargate}
+        numExecutors: 1
+        regionName: ${cluster_agent_region}
+        credentialsId: ""
+        retainAgents: false
+        retentionTimeout: ${retention_timeout}
+        templates:
+          - label: "agent"
+            agentContainerName: ${name}
+            image: ${image}
+            cpu: ${cpu}
+            memory: ${memory}
+            memoryReservation: ${memory}
+            executionRole: ${execution_role}
+            launchType: FARGATE
+            networkMode: awsvpc
+            assignPublicIp: true # TODO
+            templateName: jenkins-agent
+            securityGroups: ${security_groups}
+            subnets: ${subnets}

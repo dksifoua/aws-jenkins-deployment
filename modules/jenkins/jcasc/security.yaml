@@ -1,4 +1,7 @@
 jenkins:
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
   securityRealm:
     local:
       allowsSignup: false

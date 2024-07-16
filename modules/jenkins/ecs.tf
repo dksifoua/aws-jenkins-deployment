@@ -8,6 +8,16 @@ resource "aws_ecs_cluster" "jenkins" {
   tags = var.tags
 }
 
+resource "aws_ecs_cluster" "agent_spot" {
+  name = "jenkins-agent-spot-ecs"
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+
+  tags = var.tags
+}
+
 resource "aws_ecs_cluster_capacity_providers" "jenkins" {
   cluster_name       = aws_ecs_cluster.jenkins.name
   capacity_providers = ["FARGATE"]
@@ -16,6 +26,15 @@ resource "aws_ecs_cluster_capacity_providers" "jenkins" {
     base              = 1
   }
 }
+
+/*resource "aws_ecs_cluster_capacity_providers" "agent_spot" {
+  cluster_name       = aws_ecs_cluster.agent_spot.name
+  capacity_providers = ["FARGATE_SPOT"]
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    base              = 1
+  }
+}*/
 
 resource "aws_ecs_task_definition" "jenkins_controller" {
   container_definitions = templatefile("${path.module}/templates/jenkins_controller.json", {
@@ -37,6 +56,7 @@ resource "aws_ecs_task_definition" "jenkins_controller" {
     operating_system_family = "LINUX"
   }
 
+  depends_on = [null_resource.build_docker_image]
   tags = var.tags
 }
 
