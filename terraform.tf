@@ -1,12 +1,12 @@
 terraform {
   required_version = ">= 1.6.6"
 
-  cloud {
-    organization = "dksifoua"
-
-    workspaces {
-      name = "aws-jenkins-deployment"
-    }
+  backend "s3" {
+    bucket  = "tf-state-dimitri"
+    key     = "aws-jenkins-deployment/terraform.tfstate"
+    region  = "us-east-1"
+    profile = "dimitri@dksifoua.io"
+    encrypt = true
   }
 
   required_providers {
@@ -26,5 +26,6 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region  = "us-east-1"
+  profile = "dimitri@dksifoua.io"
 }

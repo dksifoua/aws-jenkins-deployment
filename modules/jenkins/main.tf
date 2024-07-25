@@ -11,7 +11,7 @@ data "aws_subnets" "main" {
   }
 }
 
-locals {
+/*locals {
   jenkins_agent_conf = templatefile("${path.module}/templates/clouds.ecs.yaml", {
     cluster_agent_fargate = aws_ecs_cluster.jenkins.arn
     cluster_agent_region  = data.aws_region.current.name
@@ -44,7 +44,7 @@ resource "null_resource" "build_docker_image" {
   }
 
   depends_on = [local_file.jenkins_agent_conf]
-}
+}*/
 
 resource "aws_cloudwatch_log_group" "ecs" {
   name = var.log_group

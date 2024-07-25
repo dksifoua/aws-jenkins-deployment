@@ -56,7 +56,7 @@ resource "aws_ecs_task_definition" "jenkins_controller" {
     operating_system_family = "LINUX"
   }
 
-  depends_on = [null_resource.build_docker_image]
+  # depends_on = [null_resource.build_docker_image]
   tags = var.tags
 }
 

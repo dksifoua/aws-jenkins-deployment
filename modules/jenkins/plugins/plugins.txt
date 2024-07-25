@@ -1,4 +1,4 @@
-# amazon-ecs:latest
+amazon-ecs:latest
 blueocean:latest
 configuration-as-code:latest
 docker-plugin:latest
