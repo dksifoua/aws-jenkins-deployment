@@ -18,13 +18,13 @@ data "aws_iam_policy_document" "ecs_execution_policy" {
 }
 
 resource "aws_iam_role" "ecs_execution_role" {
-  name               = "ecs_jenkins"
+  name               = "ecs-jenkins"
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_policy.json
   tags               = var.tags
 }
 
 resource "aws_iam_policy" "ecs_execution_policy" {
-  name   = "ecs_jenkins"
+  name   = "ecs-jenkins"
   policy = data.aws_iam_policy_document.ecs_execution_policy.json
   tags   = var.tags
 }

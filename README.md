@@ -15,3 +15,4 @@ TODOs
 - [] Move Jenkins to Private Subnet
 - [] Allows Jenkins Internet Access
 - [] Setup Jenkins Monitoring
+- [] Add tests

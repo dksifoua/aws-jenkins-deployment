@@ -3,7 +3,7 @@ LABEL authors="Dimitri Sifoua"
 LABEL description="Jenkins CI/CD Server"
 LABEL maintainer="Dimitri Sifoua <dimitri.sifoua@gmail.com>"
 LABEL repository="dksifoua"
-LABEL version="1.2.0"
+LABEL version="1.3.0"
 
 ARG ENV=production
 ARG GITHUB_ACCESS_TOKEN

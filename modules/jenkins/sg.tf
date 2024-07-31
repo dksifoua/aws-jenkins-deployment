@@ -1,5 +1,5 @@
 resource "aws_security_group" "alb" {
-  name        = "alb"
+  name        = "jenkins-lb"
   description = "Application load balancer security group"
 
   ingress {
@@ -21,7 +21,7 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group" "jenkins_controller" {
-  name        = "jenkins_controller"
+  name        = "jenkins-controller"
   description = "Jenkins controller security group"
 
   ingress {

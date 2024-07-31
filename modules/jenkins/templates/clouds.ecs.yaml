@@ -1,8 +1,8 @@
 jenkins:
-  agentsProtocols:
+  agentProtocols:
     - JNLP4-connect
     - Ping
-  slaveAgentPort: \$${JENKINS_SLAVE_AGENT_PORT}
+  slaveAgentPort: $${JENKINS_SLAVE_AGENT_PORT}
   clouds:
     - ecs:
         name: jenkins-ecs-fargate-spot-agent

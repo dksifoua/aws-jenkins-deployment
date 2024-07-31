@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "jenkins" {
-  name = "jenkins-ecs"
+  name = "jenkins"
   setting {
     name  = "containerInsights"
     value = "enabled"
@@ -8,15 +8,15 @@ resource "aws_ecs_cluster" "jenkins" {
   tags = var.tags
 }
 
-resource "aws_ecs_cluster" "agent_spot" {
-  name = "jenkins-agent-spot-ecs"
+/*resource "aws_ecs_cluster" "agent_spot" {
+  name = "jenkins-spot"
   setting {
     name  = "containerInsights"
     value = "enabled"
   }
 
   tags = var.tags
-}
+}*/
 
 resource "aws_ecs_cluster_capacity_providers" "jenkins" {
   cluster_name       = aws_ecs_cluster.jenkins.name
@@ -42,7 +42,7 @@ resource "aws_ecs_task_definition" "jenkins_controller" {
     image     = var.jenkins_controller_image
     cpu       = var.jenkins_controller_cpu
     memory    = var.jenkins_controller_memory
-    log_group = aws_cloudwatch_log_group.ecs.name
+    log_group = aws_cloudwatch_log_group.jenkins_ecs.name
     region    = data.aws_region.current.name
   })
   family                   = "jenkins-controller"
@@ -56,12 +56,12 @@ resource "aws_ecs_task_definition" "jenkins_controller" {
     operating_system_family = "LINUX"
   }
 
-  # depends_on = [null_resource.build_docker_image]
-  tags = var.tags
+  depends_on = [null_resource.build_docker_image]
+  tags       = var.tags
 }
 
-resource "aws_ecs_service" "jenkins_controller_service" {
-  name             = "jenkins_controller_service"
+resource "aws_ecs_service" "jenkins_controller" {
+  name             = "jenkins-controller"
   cluster          = aws_ecs_cluster.jenkins.id
   task_definition  = aws_ecs_task_definition.jenkins_controller.arn
   desired_count    = 1
