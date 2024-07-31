@@ -5,24 +5,42 @@ jenkins:
   slaveAgentPort: $${JENKINS_SLAVE_AGENT_PORT}
   clouds:
     - ecs:
-        name: jenkins-ecs-fargate-spot-agent
+        allowedOverrides: inheritFrom,label,memory,cpu,image
         cluster: ${cluster_agent_fargate}
-        numExecutors: 1
-        regionName: ${cluster_agent_region}
-        credentialsId: ""
+        credentialsId: aws-key
+        name: ecs-fargate
+        numExecutors: 2
+        regionName: ${region}
         retainAgents: false
-        retentionTimeout: ${retention_timeout}
+        retentionTimeout: 5
+        taskPollingIntervalInSeconds: 30
         templates:
-          - label: "agent"
-            agentContainerName: ${name}
-            image: ${image}
+          - agentContainerName: ${name}
+            assignPublicIp: false
+            capacityProviderStrategies:
+              - base: 1
+                provider: FARGATE
             cpu: ${cpu}
-            memory: ${memory}
-            memoryReservation: ${memory}
+            cpuArchitecture: ARM64
+            defaultCapacityProvider: true
             executionRole: ${execution_role}
+            image: ${image}
+            label: linux
             launchType: FARGATE
+            logDriver: awslogs
+            logDriverOptions:
+              - name: awslogs-group
+                value: ${log_group}
+              - name: awslogs-region
+                value: ${region}
+              - name: awslogs-stream-prefix
+                value: agent
+            memory: 0
+            memoryReservation: ${memory}
             networkMode: awsvpc
-            assignPublicIp: true # TODO
-            templateName: jenkins-agent
+            operatingSystemFamily: LINUX
+            privileged: false
+            remoteFSRoot: "/home/jenkins"
             securityGroups: ${security_groups}
             subnets: ${subnets}
+            templateName: linux-agent

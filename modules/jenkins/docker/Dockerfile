@@ -3,8 +3,10 @@ LABEL authors="Dimitri Sifoua"
 LABEL description="Jenkins CI/CD Server"
 LABEL maintainer="Dimitri Sifoua <dimitri.sifoua@gmail.com>"
 LABEL repository="dksifoua"
-LABEL version="1.3.0"
+LABEL version="1.4.0"
 
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
 ARG ENV=production
 ARG GITHUB_ACCESS_TOKEN
 ARG GITHUB_USER
@@ -17,6 +19,8 @@ ARG JENKINS_ADMIN_USER
 ARG PLUGINS_FILE
 ARG SCRIPTS_PATH
 
+ENV AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
 ENV CASC_JENKINS_CONFIG $JENKINS_HOME/casc_configs
 ENV ENV $ENV
 ENV GITHUB_ACCESS_TOKEN $GITHUB_ACCESS_TOKEN
@@ -28,7 +32,11 @@ ENV JENKINS_ADMIN_PASS $JENKINS_ADMIN_PASS
 ENV JENKINS_ADMIN_USER $JENKINS_ADMIN_USER
 
 USER jenkins
+
 COPY ${JCASC_CONFIG_PATH}/*.yaml $CASC_JENKINS_CONFIG/
 COPY ${PLUGINS_FILE} $REF/plugins.txt
-RUN echo 2.0 > $REF/jenkins.install.UpgradeWizard.state
-RUN jenkins-plugin-cli -f $REF/plugins.txt
+
+RUN <<EOF
+  echo 2.0 > $REF/jenkins.install.UpgradeWizard.state
+  jenkins-plugin-cli -f $REF/plugins.txt
+EOF

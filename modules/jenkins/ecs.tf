@@ -8,16 +8,6 @@ resource "aws_ecs_cluster" "jenkins" {
   tags = var.tags
 }
 
-/*resource "aws_ecs_cluster" "agent_spot" {
-  name = "jenkins-spot"
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
-
-  tags = var.tags
-}*/
-
 resource "aws_ecs_cluster_capacity_providers" "jenkins" {
   cluster_name       = aws_ecs_cluster.jenkins.name
   capacity_providers = ["FARGATE"]
@@ -27,29 +17,20 @@ resource "aws_ecs_cluster_capacity_providers" "jenkins" {
   }
 }
 
-/*resource "aws_ecs_cluster_capacity_providers" "agent_spot" {
-  cluster_name       = aws_ecs_cluster.agent_spot.name
-  capacity_providers = ["FARGATE_SPOT"]
-  default_capacity_provider_strategy {
-    capacity_provider = "FARGATE_SPOT"
-    base              = 1
-  }
-}*/
-
-resource "aws_ecs_task_definition" "jenkins_controller" {
+resource "aws_ecs_task_definition" "jenkins" {
   container_definitions = templatefile("${path.module}/templates/jenkins_controller.json", {
-    name      = var.jenkins_controller_container
-    image     = var.jenkins_controller_image
-    cpu       = var.jenkins_controller_cpu
-    memory    = var.jenkins_controller_memory
-    log_group = aws_cloudwatch_log_group.jenkins_ecs.name
+    name      = var.jenkins_container
+    image     = var.jenkins_image
+    cpu       = var.jenkins_cpu
+    memory    = var.jenkins_memory
+    log_group = aws_cloudwatch_log_group.jenkins.name
     region    = data.aws_region.current.name
   })
   family                   = "jenkins-controller"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = var.jenkins_controller_cpu
-  memory                   = var.jenkins_controller_memory
+  cpu                      = var.jenkins_cpu
+  memory                   = var.jenkins_memory
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
   runtime_platform {
     cpu_architecture        = "ARM64"
@@ -60,16 +41,16 @@ resource "aws_ecs_task_definition" "jenkins_controller" {
   tags       = var.tags
 }
 
-resource "aws_ecs_service" "jenkins_controller" {
+resource "aws_ecs_service" "jenkins" {
   name             = "jenkins-controller"
   cluster          = aws_ecs_cluster.jenkins.id
-  task_definition  = aws_ecs_task_definition.jenkins_controller.arn
+  task_definition  = aws_ecs_task_definition.jenkins.arn
   desired_count    = 1
   launch_type      = "FARGATE"
   platform_version = "LATEST"
 
   load_balancer {
-    container_name   = var.jenkins_controller_container
+    container_name   = var.jenkins_container
     container_port   = 8080
     target_group_arn = aws_lb_target_group.jenkins.arn
   }

@@ -1,17 +1,9 @@
-version: '3'
+version: 3
 
 dotenv:
-  - ".env"
+  - .env
 
 vars:
-  BUILDER: desktop-linux
-#  BUILDER:
-#    sh: |
-#      if [ $ENV == "local" ]; then
-#        echo "desktop-linux"
-#      else
-#        echo "cloud-dksifoua-builder"
-#      fi
   DOCKER_FILE: modules/jenkins/docker/Dockerfile
   JCASC_CONFIG_PATH: modules/jenkins/jcasc/
   PLUGINS_FILE: modules/jenkins/plugins/plugins.txt
@@ -21,10 +13,12 @@ vars:
     sh: grep 'LABEL version=' {{.DOCKER_FILE}} | cut -d '"' -f 2
 
 tasks:
-  build:
-    desc: "Build Jenkins image"
+  docker:build:
+    desc: Build Jenkins image
     cmd: |
       docker build \
+        --build-arg AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+        --build-arg AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
         --build-arg ENV="$ENV" \
         --build-arg JCASC_CONFIG_PATH="{{.JCASC_CONFIG_PATH}}" \
         --build-arg JENKINS_ADMIN_DESC="$JENKINS_ADMIN_DESC" \
@@ -35,19 +29,14 @@ tasks:
         --build-arg GITHUB_ACCESS_TOKEN="$GITHUB_ACCESS_TOKEN" \
         --build-arg GITHUB_USER="$GITHUB_USER" \
         --build-arg PLUGINS_FILE="{{.PLUGINS_FILE}}" \
-        --builder {{.BUILDER}} \
         --file {{.DOCKER_FILE}} \
         --tag {{.REPOSITORY}}/jenkins:{{.VERSION}} \
         --no-cache \
         .
     silent: true
 
-  get:
-    cmd: echo $ENV
-    silent: true
-
-  run:
-    desc: "Run local Jenkins container"
+  docker:run:
+    desc: Run local Jenkins container
     cmd: |
       docker run \
         --detach \
@@ -58,47 +47,49 @@ tasks:
         {{.REPOSITORY}}/jenkins:{{.VERSION}}
     silent: true
 
-  tag:
+  docker:tag:
     desc: "Tag Jenkins image"
     cmd: docker tag {{.REPOSITORY}}/jenkins:{{.VERSION}} {{.REPOSITORY}}/jenkins:latest
     silent: true
 
-  push:
-    desc: "Push Jenkins image to DockerHub"
+  docker:push:
+    desc: Push Jenkins image to DockerHub
     cmds:
       - docker push {{.REPOSITORY}}/jenkins:{{.VERSION}}
       - docker push {{.REPOSITORY}}/jenkins:latest
     silent: true
 
-  tf-init:
-    desc: "Initialize Terraform working directory"
+  tf:init:
+    desc: Initialize Terraform working directory
     cmd: terraform init -upgrade
     silent: true
 
-  tf-validate:
-    desc: "Validate the Terraform configuration"
+  tf:validate:
+    desc: Validate the Terraform configuration
     cmd: terraform validate
     silent: true
 
-  tf-fmt:
-    desc: "Format Terraform configuration files"
+  tf:fmt:
+    desc: Format Terraform configuration files
     cmd: terraform fmt -recursive
     silent: true
 
-  tf-plan:
-    desc: "Create execution plan from the Terraform configuration"
+  tf:plan:
+    desc: Create execution plan from the Terraform configuration
     cmd: terraform plan -out=plan.out
     silent: true
 
-  tf-apply:
-    desc: "Apply Terraform configuration"
+  tf:apply:
+    desc: Apply Terraform configuration
     cmds:
-      - defer: rm plan.out
-      - task: tf-plan
+      - defer: |
+          rm plan.out
+          rm -f modules/jenkins/jcasc/clouds.ecs.yaml
+      - task: tf:plan
       - terraform apply plan.out
     silent: true
 
-  tf-destroy:
-    desc: "Destroy Terraform configuration"
+  tf:destroy:
+    desc: Destroy Terraform configuration
     cmd: terraform destroy -auto-approve
     silent: true

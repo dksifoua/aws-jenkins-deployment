@@ -3,42 +3,42 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "jenkins_controller_image" {
-  description = "The jenkins controller docker image"
+variable "jenkins_image" {
+  description = "The jenkins docker image"
   type        = string
 }
 
-variable "jenkins_controller_container" {
-  description = "The jenkins controller container name"
+variable "jenkins_container" {
+  description = "The jenkins container name"
   type        = string
 }
 
-variable "jenkins_controller_cpu" {
-  description = "The jenkins controller cpu quantity"
+variable "jenkins_cpu" {
+  description = "The jenkins cpu quantity"
   type        = number
 }
 
-variable "jenkins_controller_memory" {
-  description = "The jenkins controller memory quantity"
+variable "jenkins_memory" {
+  description = "The jenkins memory quantity"
   type        = number
 }
 
-variable "jenkins_agent_image" {
+variable "agent_image" {
   description = "The jenkins agent docker image"
   type        = string
 }
 
-variable "jenkins_agent_container" {
+variable "agent_container" {
   description = "The jenkins agent container name"
   type        = string
 }
 
-variable "jenkins_agent_cpu" {
+variable "agent_cpu" {
   description = "The jenkins agent cpu quantity"
   type        = number
 }
 
-variable "jenkins_agent_memory" {
+variable "agent_memory" {
   description = "The jenkins agent memory quantity"
   type        = number
 }

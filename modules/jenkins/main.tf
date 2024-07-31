@@ -14,12 +14,12 @@ data "aws_subnets" "main" {
 locals {
   jenkins_agent_conf = templatefile("${path.module}/templates/clouds.ecs.yaml", {
     cluster_agent_fargate = aws_ecs_cluster.jenkins.arn
-    cluster_agent_region  = data.aws_region.current.name
-    retention_timeout     = var.agent_retention_timeout
-    name                  = var.jenkins_agent_container
-    image                 = var.jenkins_agent_image
-    cpu                   = var.jenkins_agent_cpu
-    memory                = var.jenkins_agent_memory
+    region                = data.aws_region.current.name
+    name                  = var.agent_container
+    image                 = var.agent_image
+    cpu                   = var.agent_cpu
+    memory                = var.agent_memory
+    log_group             = aws_cloudwatch_log_group.jenkins.name
     execution_role        = aws_iam_role.ecs_execution_role.arn
     security_groups       = aws_security_group.jenkins_controller.id
     subnets               = join(",", data.aws_subnets.main.ids)
@@ -39,14 +39,14 @@ resource "null_resource" "build_docker_image" {
 
   provisioner "local-exec" {
     command = <<EOF
-      task build tag push
+      task docker:build docker:tag docker:push
     EOF
   }
 
   depends_on = [local_file.jenkins_agent_conf]
 }
 
-resource "aws_cloudwatch_log_group" "jenkins_ecs" {
+resource "aws_cloudwatch_log_group" "jenkins" {
   name = var.log_group
   tags = var.tags
 }
