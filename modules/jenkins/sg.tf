@@ -20,7 +20,7 @@ resource "aws_security_group" "alb" {
   tags = var.tags
 }
 
-resource "aws_security_group" "jenkins_controller" {
+resource "aws_security_group" "jenkins" {
   name        = "jenkins-controller"
   description = "Jenkins controller security group"
 
@@ -30,6 +30,27 @@ resource "aws_security_group" "jenkins_controller" {
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
     description     = "Allow traffic from alb"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.tags
+}
+
+resource "aws_security_group" "agent" {
+  name        = "jenkins-agent"
+  description = "Jenkins agent security group"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {

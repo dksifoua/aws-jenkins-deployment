@@ -31,7 +31,7 @@ resource "aws_ecs_task_definition" "jenkins" {
   network_mode             = "awsvpc"
   cpu                      = var.jenkins_cpu
   memory                   = var.jenkins_memory
-  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  execution_role_arn       = aws_iam_role.jenkins.arn
   runtime_platform {
     cpu_architecture        = "ARM64"
     operating_system_family = "LINUX"
@@ -42,7 +42,7 @@ resource "aws_ecs_task_definition" "jenkins" {
 }
 
 resource "aws_ecs_service" "jenkins" {
-  name             = "jenkins-controller"
+  name             = "jenkins"
   cluster          = aws_ecs_cluster.jenkins.id
   task_definition  = aws_ecs_task_definition.jenkins.arn
   desired_count    = 1
@@ -57,7 +57,7 @@ resource "aws_ecs_service" "jenkins" {
 
   network_configuration {
     subnets          = data.aws_subnets.main.ids
-    security_groups  = [aws_security_group.jenkins_controller.id]
+    security_groups  = [aws_security_group.jenkins.id]
     assign_public_ip = true
   }
 

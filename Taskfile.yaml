@@ -19,7 +19,6 @@ tasks:
       docker build \
         --build-arg AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
         --build-arg AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
-        --build-arg ENV="$ENV" \
         --build-arg JCASC_CONFIG_PATH="{{.JCASC_CONFIG_PATH}}" \
         --build-arg JENKINS_ADMIN_DESC="$JENKINS_ADMIN_DESC" \
         --build-arg JENKINS_ADMIN_EMAIL="$JENKINS_ADMIN_EMAIL" \

@@ -5,7 +5,7 @@ jenkins:
   slaveAgentPort: $${JENKINS_SLAVE_AGENT_PORT}
   clouds:
     - ecs:
-        allowedOverrides: inheritFrom,label,memory,cpu,image
+        allowedOverrides: label
         cluster: ${cluster_agent_fargate}
         credentialsId: aws-key
         name: ecs-fargate
